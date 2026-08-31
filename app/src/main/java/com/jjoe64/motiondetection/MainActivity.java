@@ -1,62 +1,63 @@
 package com.jjoe64.motiondetection;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.os.Vibrator;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.os.Vibrator;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.jjoe64.motiondetection.motiondetection.MotionDetector;
-import com.jjoe64.motiondetection.motiondetection.MotionDetectorCallback;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.jjoe64.motiondetection.MotionDetector;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView txtStatus;
-    private MotionDetector motionDetector;
 
+    private MotionDetector motionDetector;
+    private TextView txtStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        txtStatus = (TextView) findViewById(R.id.txtStatus);
+        txtStatus = findViewById(R.id.txtStatus);
+        FrameLayout previewContainer = findViewById(R.id.previewContainer);
 
-        motionDetector = new MotionDetector(this, (SurfaceView) findViewById(R.id.surfaceView));
-        motionDetector.setMotionDetectorCallback(new MotionDetectorCallback() {
+        // Initialize the MotionDetector
+        motionDetector = new MotionDetector(
+                this,
+                previewContainer,
+                MotionDetector.CameraType.BACK, // Choose FRONT or BACK camera
+                500, // checkInterval (e.g., 500ms)
+                1000 // minLuma
+        );
+
+        // Set the MotionDetectorCallback
+        motionDetector.setMotionDetectorCallback(new MotionDetector.MotionDetectorCallback() {
             @Override
             public void onMotionDetected() {
-                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(80);
-                txtStatus.setText("Motion detected");
+                runOnUiThread(() -> {
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    if (v != null) {
+                        v.vibrate(80);
+                    }
+                    txtStatus.setText("Motion detected");
+                });
             }
 
             @Override
             public void onTooDark() {
-                txtStatus.setText("Too dark here");
+                runOnUiThread(() -> {
+                    txtStatus.setText("Too dark here");
+                });
             }
         });
-
-        ////// Config Options
-        //motionDetector.setCheckInterval(500);
-        //motionDetector.setLeniency(20);
-        //motionDetector.setMinLuma(1000);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        motionDetector.onResume();
-
-        if (motionDetector.checkCameraHardware()) {
-            txtStatus.setText("Camera found");
-        } else {
-            txtStatus.setText("No camera available");
-        }
+        motionDetector.onResume(this); // Pass the LifecycleOwner (this activity)
     }
 
     @Override
@@ -64,5 +65,4 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         motionDetector.onPause();
     }
-
 }
