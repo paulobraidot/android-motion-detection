@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.jjoe64.motiondetection.MotionDetector;
+import com.jjoe64.motiondetection.motiondetection.MotionDetector;
 
 public class MainActivity extends AppCompatActivity {
 
