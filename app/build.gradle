@@ -1,26 +1,35 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
-
+    compileSdkVersion 34
+    
     defaultConfig {
         applicationId "com.jjoe64.motiondetection"
-        minSdkVersion 15
-        targetSdkVersion 21
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.4.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
 }
