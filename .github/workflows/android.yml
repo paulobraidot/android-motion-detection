@@ -31,5 +31,5 @@ jobs:
     - name: Subir APK compilado
       uses: actions/upload-artifact@v4
       with:
-        name: App-Modern-Debug
+        name: android-motion-detection
         path: app/build/outputs/apk/debug/app-debug.apk
