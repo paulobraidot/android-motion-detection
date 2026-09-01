@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+    namespace "com.jjoe64.motiondetection" 
     compileSdkVersion 34
     
     defaultConfig {
