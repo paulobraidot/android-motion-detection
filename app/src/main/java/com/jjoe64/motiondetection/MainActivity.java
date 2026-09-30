@@ -20,8 +20,8 @@ import android.os.Vibrator;
 import android.view.SurfaceView;
 import android.widget.TextView;
 
-import com.example.jjoe64.motiondetection.motiondetection.MotionDetector;
-import com.example.jjoe64.motiondetection.motiondetection.MotionDetectorCallback;
+import com.jjoe64.motiondetection.motiondetection.MotionDetector;
+import com.jjoe64.motiondetection.motiondetection.MotionDetectorCallback;
 
 public class MainActivity extends AppCompatActivity {
 
