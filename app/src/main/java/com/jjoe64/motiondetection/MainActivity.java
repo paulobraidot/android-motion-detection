@@ -1,63 +1,78 @@
 package com.jjoe64.motiondetection;
 
-import android.content.Context;
 import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.view.PreviewView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import android.content.Context;
+//import android.content.pm.PackageManager;
+//import android.hardware.Camera;
 import android.os.Vibrator;
-import android.widget.FrameLayout;
+// import android.support.v7.app.AppCompatActivity;
+//import android.os.Bundle;
+//import android.util.Log;
+//import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.jjoe64.motiondetection.motiondetection.MotionDetector;
+import com.example.motiondetection.motiondetection.MotionDetector;
+import com.example.motiondetection.motiondetection.MotionDetectorCallback;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MotionDetector motionDetector;
     private TextView txtStatus;
+    private MotionDetector motionDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-        txtStatus = findViewById(R.id.txtStatus);
-        FrameLayout previewContainer = findViewById(R.id.previewContainer);
+        txtStatus = (TextView) findViewById(R.id.txtStatus);
 
-        // Initialize the MotionDetector
-        motionDetector = new MotionDetector(
-                this,
-                previewContainer,
-                MotionDetector.CameraType.BACK, // Choose FRONT or BACK camera
-                500, // checkInterval (e.g., 500ms)
-                1000 // minLuma
-        );
-
-        // Set the MotionDetectorCallback
-        motionDetector.setMotionDetectorCallback(new MotionDetector.MotionDetectorCallback() {
+//        motionDetector = new MotionDetector(this, (SurfaceView) findViewById(R.id.surfaceView));
+        motionDetector = new MotionDetector(this, (PreviewView) findViewById(R.id.previewView));
+        motionDetector.setMotionDetectorCallback(new MotionDetectorCallback() {
             @Override
             public void onMotionDetected() {
-                runOnUiThread(() -> {
-                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    if (v != null) {
-                        v.vibrate(80);
-                    }
-                    txtStatus.setText("Motion detected");
-                });
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(80);
+                txtStatus.setText("Motion detected");
             }
 
             @Override
             public void onTooDark() {
-                runOnUiThread(() -> {
-                    txtStatus.setText("Too dark here");
-                });
+                txtStatus.setText("Too dark here");
             }
         });
+
+        ////// Config Options
+        //motionDetector.setCheckInterval(500);
+        //motionDetector.setLeniency(20);
+        //motionDetector.setMinLuma(1000);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        motionDetector.onResume(this); // Pass the LifecycleOwner (this activity)
+        motionDetector.onResume();
+
+        if (motionDetector.checkCameraHardware()) {
+            txtStatus.setText("Camera found");
+        } else {
+            txtStatus.setText("No camera available");
+        }
     }
 
     @Override
